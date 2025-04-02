@@ -1,1 +1,85 @@
-# -viralregenerationsimulation-
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define WIDTH 20
+#define HEIGHT 20
+
+void initialize_grid(bool grid[HEIGHT][WIDTH]) {
+
+    srand(time(NULL));
+
+    for (int i = 0; i < HEIGHT; i++) {
+        for (int j = 0; j < WIDTH; j++) {
+            grid[i][j] = rand() % 2; 
+        }
+    }
+}
+
+int count_live_neighbors(const bool grid[HEIGHT][WIDTH], int x, int y) {
+    int count = 0;
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            if (i == 0 && j == 0) continue; 
+
+            int nx = (x + i + HEIGHT) % HEIGHT;
+            int ny = (y + j + WIDTH) % WIDTH;
+
+            if (grid[nx][ny]) count++;
+        }
+    }
+    return count;
+}
+
+void update_grid(bool grid[HEIGHT][WIDTH], bool next_grid[HEIGHT][WIDTH]) {
+    for (int i = 0; i < HEIGHT; i++) {
+        for (int j = 0; j < WIDTH; j++) {
+            int live_neighbors = count_live_neighbors(grid, i, j);
+            if (grid[i][j]) { 
+                if (live_neighbors < 2 || live_neighbors > 3) {
+                    next_grid[i][j] = false; 
+                } else {
+                    next_grid[i][j] = true; 
+                }
+            } else { 
+                if (live_neighbors == 3) {
+                    next_grid[i][j] = true; 
+                } else {
+                    next_grid[i][j] = false; 
+                }
+            }
+        }
+    }
+    for (int i = 0; i < HEIGHT; i++) {
+        for (int j = 0; j < WIDTH; j++) {
+            grid[i][j] = next_grid[i][j];
+        }
+    }
+}
+
+void print_grid(const bool grid[HEIGHT][WIDTH]) {
+    for (int i = 0; i < HEIGHT; i++) {
+        for (int j = 0; j < WIDTH; j++) {
+            printf(" %c ", grid[i][j] ? '#' : '.');
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    bool grid[HEIGHT][WIDTH];
+    bool next_grid[HEIGHT][WIDTH]; 
+
+    srand(time(NULL)); 
+    initialize_grid(grid);
+
+    while (1) { 
+        system("clear"); 
+        print_grid(grid);
+        update_grid(grid, next_grid);
+        usleep(1000000); 
+    }
+
+    return 0;
+}
+    
